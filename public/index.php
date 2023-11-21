@@ -36,7 +36,7 @@ $app->group('/api', function (RouteCollectorProxy $group) use ($usuarioControlle
 });
 
 // Instancia mi controlador de productos
-$productoController = new ProductosController();
+$productoController = new ProductoController();
 
 // Configura los endpoint utilizando RouteCollectorProxy (en productoController estan las rutas)
 $app->group('/api', function (RouteCollectorProxy $group) use ($productoController) {

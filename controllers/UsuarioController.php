@@ -90,7 +90,7 @@ class UsuarioController implements IApiUsable
         // Verifica el token y el acceso del usuario
         $this->verificarAcceso($request, 'Socio');
 
-        // Obtén el idUsuario del cuerpo de la solicitud (si se envía como parte del cuerpo)
+        //   el idUsuario del cuerpo de la solicitud (si se envía como parte del cuerpo)
         $data = $request->getParsedBody();
         $idUsuario = isset($data['idUsuario']) ? $data['idUsuario'] : null;
 
@@ -130,7 +130,7 @@ class UsuarioController implements IApiUsable
         // Verifica el token y el acceso del usuario
         $this->verificarAcceso($request, 'Socio');
     
-        // Obtén los datos a modificar del cuerpo de la solicitud
+        //   los datos a modificar del cuerpo de la solicitud
         $data = $request->getParsedBody();
     
         // Verifica si el usuario proporcionó el idUsuario
@@ -206,7 +206,7 @@ class UsuarioController implements IApiUsable
     // Implementación de la interfaz para obtener todos los elementos
     public function TraerTodos($request, $response, $args)
     {
-        // Obtén una instancia de la conexión PDO
+        //   una instancia de la conexión PDO
         $conexionPDO = ConexionPDO::obtenerInstancia();
     
         // Intenta realizar la consulta para obtener todos los elementos
@@ -235,10 +235,10 @@ class UsuarioController implements IApiUsable
     // Implementación de la interfaz para obtener un solo elemento
     public function TraerUno($request, $response, $args)
     {
-        // Obtén una instancia de la conexión PDO
+        //   una instancia de la conexión PDO
         $conexionPDO = ConexionPDO::obtenerInstancia();
 
-        // Obtén el parámetro 'id' de los parámetros de consulta
+        //   el parámetro 'id' de los parámetros de consulta
         $queryParams = $request->getQueryParams();
 
          // Verifica si se proporcionó 'idUsuario' o 'mail'

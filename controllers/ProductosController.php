@@ -12,14 +12,14 @@ require_once __DIR__ . '/../models/Producto.php';
 require_once __DIR__ . '/../middlewares/AuthJWT.php';
 require_once __DIR__ . '/../interfaces/IApiUsable.php';
 
-class ProductosController implements IApiUsable
+class ProductoController implements IApiUsable
 {
     public function TraerUno($request, $response, $args)
     {
-        // Obtener instancia de conexión 
+        //  instancia de conexión 
         $conexionPDO = ConexionPDO::obtenerInstancia();
         
-        // Obtén el parámetro 'id' de los parámetros de consulta
+        // el parámetro 'id' de los parámetros de consulta
         $queryParams = $request->getQueryParams();
 
         // Verifica si se proporcionó 'idProducto' o 'nombreProducto'
@@ -73,7 +73,7 @@ class ProductosController implements IApiUsable
 
     public function TraerTodos($request, $response, $args)
     {
-        // Obtén todos los productos
+        // todos los productos
         $productos = Producto::TraerTodosLosProductos();
 
         // Construir la respuesta
@@ -84,7 +84,7 @@ class ProductosController implements IApiUsable
 
     public function CargarUno($request, $response, $args)
     {
-        // Obtén los datos del cuerpo de la solicitud
+        // los datos del cuerpo de la solicitud
         $data = $request->getParsedBody();
 
         // Verifica los datos obligatorios
@@ -119,8 +119,17 @@ class ProductosController implements IApiUsable
 
     public function BorrarUno($request, $response, $args)
     {
-        // Obtén el ID del producto a borrar
-        $idProducto = $args['idProducto'];
+        // los datos del cuerpo de la solicitud
+        $data = $request->getParsedBody();
+    
+        // Verifica si se proporcionó el ID del producto en el cuerpo
+        if (!isset($data['idProducto'])) {
+            $response->getBody()->write(json_encode(array('error' => 'ID de producto no proporcionado')));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
+    
+        // el ID del producto a borrar desde el cuerpo de la solicitud
+        $idProducto = $data['idProducto'];
     
         // Verifica si el ID es válido
         if (!is_numeric($idProducto) || $idProducto <= 0) {
@@ -128,48 +137,75 @@ class ProductosController implements IApiUsable
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
     
-        // Crea un nuevo producto con el ID
-        $producto = new Producto();
-        $producto->idProducto = $idProducto;
+        // Verifica si el producto existe
+        $producto = Producto::TraerUnProducto($idProducto);
     
-        // Intenta borrar el producto
-        try {
-            $filasAfectadas = $producto->BorrarProducto();
+        if (!$producto) {
+            $response->getBody()->write(json_encode(array('error' => 'Producto no encontrado')));
+            return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
+        }
     
-            if ($filasAfectadas > 0) {
-                // Producto borrado exitosamente
-                $response->getBody()->write(json_encode(array('mensaje' => 'Producto borrado correctamente')));
-                return $response->withHeader('Content-Type', 'application/json');
-            } else {
-                // Producto no encontrado
-                $response->getBody()->write(json_encode(array('error' => 'Producto no encontrado')));
-                return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
-            }
-        } catch (PDOException $e) {
-            // Error de base de datos
-            $response->getBody()->write(json_encode(array('error' => 'Error de base de datos')));
+        // Verifica si el producto ya está en estado "Baja" 
+        if ($producto->estado === 'eliminado') {
+            $response->getBody()->write(json_encode(array('error' => 'Error, el producto fue dado de baja previamente')));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
+    
+        // Realiza la operación de dar de baja al producto utilizando una función adecuada
+        $filasAfectadas = $producto->BorrarProducto();
+    
+        if ($filasAfectadas > 0) {
+            // Producto borrado exitosamente
+            $response->getBody()->write(json_encode(array('mensaje' => 'Producto borrado correctamente')));
+            return $response->withHeader('Content-Type', 'application/json');
+        } else {
+            // Error al borrar el producto
+            $response->getBody()->write(json_encode(array('error' => 'Error al borrar el producto')));
             return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
         }
     }
 
     public function ModificarUno($request, $response, $args)
     {
-        // Obtén el ID del producto a modificar
-        $idProducto = $args['idProducto'];
-
-        // Obtén los datos del cuerpo de la solicitud
+        // datos del cuerpo de la solicitud
         $data = $request->getParsedBody();
 
+        // el ID del producto a modificar
+        $idProducto = $data['idProducto'];
+    
+        // los datos del cuerpo de la solicitud
+        $data = $request->getParsedBody();
+    
         // Crea un nuevo producto con los datos proporcionados
         $producto = new Producto();
         $producto->idProducto = $idProducto;
-        $producto->nombreProducto = $data['nombreProducto'];
-        $producto->precioProducto = $data['precioProducto'];
-        $producto->categoriaProducto = $data['categoriaProducto'];
-
+    
+        // Verifica si se tienen cada campo en el cuerpo y actualiza el producto
+        if (isset($data['nombreProducto'])) {
+            $producto->nombreProducto = $data['nombreProducto'];
+        }
+    
+        if (isset($data['precioProducto'])) {
+            $producto->precioProducto = $data['precioProducto'];
+        }
+    
+        if (isset($data['categoriaProducto'])) {
+            $producto->categoriaProducto = $data['categoriaProducto'];
+        }
+    
+        if (isset($data['estado'])) {
+            // Verifica si el estado proporcionado es válido (eliminado o activo)
+            if ($data['estado'] === 'eliminado' || $data['estado'] === 'activo') {
+                $producto->estado = $data['estado'];
+            } else {
+                $response->getBody()->write(json_encode(array('error' => 'Estado no válido')));
+                return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+            }
+        }
+    
         // Intenta modificar el producto
         $idModificado = $producto->ModificarProductoParametros();
-
+    
         if ($idModificado !== false) {
             // Producto modificado exitosamente
             $response->getBody()->write(json_encode(array('idProducto' => $idModificado, 'mensaje' => 'Producto modificado correctamente')));
@@ -187,7 +223,7 @@ class ProductosController implements IApiUsable
         $group->get('/producto/{idProducto}', [$this, 'TraerUno']);
         $group->get('/productos', [$this, 'TraerTodos']);
         $group->post('/agregar-producto', [$this, 'CargarUno']);
-        $group->put('/modificar-producto/{idProducto}', [$this, 'ModificarUno']);
+        $group->post('/modificar-producto', [$this, 'ModificarUno']);
         $group->post('/borrar-producto/{idProducto}', [$this, 'BorrarUno']);
     }
 }

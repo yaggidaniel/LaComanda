@@ -12,6 +12,8 @@ class Producto
     public $precioProducto;
     public $categoriaProducto;
 
+    public $estado;
+
     // Inserta un nuevo producto en la base de datos.
     public function InsertarProducto()
     {
@@ -41,7 +43,7 @@ class Producto
     public static function TraerTodosLosProductos()
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("SELECT idProducto, nombreProducto, precioProducto, categoriaProducto FROM productos");
+        $consulta = $objetoAccesoDato->prepararConsulta("SELECT idProducto, nombreProducto, precioProducto, categoriaProducto, estado FROM productos");
         $consulta->execute();
 
         // Retorna un arreglo de objetos Producto.
@@ -61,16 +63,21 @@ class Producto
         return $productoBuscado;
     }  
 
-    //REtornar el producto por nombre
+    // Traer un producto por nombre
     public static function TraerUnProductoPorNombre($nombreProducto)
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
         $consulta = $objetoAccesoDato->prepararConsulta("SELECT idProducto, nombreProducto, precioProducto, categoriaProducto FROM productos WHERE nombreProducto = :nombreProducto");
         $consulta->bindValue(':nombreProducto', $nombreProducto, PDO::PARAM_STR);
         $consulta->execute();
-        $productoBuscado = $consulta->fetchObject('Producto');
 
-        // Retorna el producto encontrado o null si no existe.
+        // Cambia esta parte para verificar si encontró el producto
+        $productoBuscado = $consulta->fetchObject('Producto');
+        if (!$productoBuscado) {
+            return null; // Producto no encontrado
+        }
+
+        // Retorna el producto encontrado
         return $productoBuscado;
     }
 
@@ -79,11 +86,23 @@ class Producto
     public function ModificarProductoParametros()
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE productos SET nombreProducto = :nombreProducto, precioProducto = :precioProducto, categoriaProducto = :categoriaProducto WHERE id = :id");
+        
+        // Actualiza la consulta SQL para incluir el campo 'estado'
+        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE productos SET nombreProducto = :nombreProducto, precioProducto = :precioProducto, categoriaProducto = :categoriaProducto, estado = :estado WHERE idProducto = :idProducto");
+        
         $consulta->bindValue(':idProducto', $this->idProducto, PDO::PARAM_INT);
         $consulta->bindValue(':nombreProducto', $this->nombreProducto, PDO::PARAM_STR);
         $consulta->bindValue(':precioProducto', $this->precioProducto, PDO::PARAM_STR);
         $consulta->bindValue(':categoriaProducto', $this->categoriaProducto, PDO::PARAM_STR);
+        
+        // Verifica si 'estado' está configurado y vincula el valor
+        if (isset($this->estado)) {
+            $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
+        } else {
+            // Si 'estado' no está configurado, asume un valor predeterminado (o puedes manejarlo de acuerdo a tus necesidades)
+            $consulta->bindValue(':estado', 'activo', PDO::PARAM_STR);
+        }
+
         $resultado = $consulta->execute();
 
         $filasAfectadas = $consulta->rowCount();
@@ -94,16 +113,17 @@ class Producto
         // Retorna el ID del producto modificado o false si falla.
         return $this->idProducto;
     }
-
     // Elimina un producto de la base de datos por su ID.
     public function BorrarProducto()
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("DELETE FROM productos WHERE idProducto = :idProducto");
+
+        // Cambia la consulta para actualizar el estado
+        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE productos SET estado = 'eliminado' WHERE idProducto = :idProducto");
         $consulta->bindValue(':idProducto', $this->idProducto, PDO::PARAM_INT);
         $consulta->execute();
-        
-        // Retorna la cantidad de filas afectadas (1 si se eliminó correctamente, 0 si no se encontró).
+
+        // Retorna la cantidad de filas afectadas (1 si se actualizó correctamente, 0 si no se encontró).
         return $consulta->rowCount();
     }
 }
