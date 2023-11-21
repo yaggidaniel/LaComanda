@@ -12,6 +12,7 @@ use Slim\Routing\RouteCollectorProxy;
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../controllers/UsuarioController.php';
 require_once __DIR__ . '/../controllers/ProductosController.php';
+require_once __DIR__ . '/../controllers/MesaController.php';
 
 
 // Instantiate App
@@ -42,6 +43,18 @@ $productoController = new ProductoController();
 $app->group('/api', function (RouteCollectorProxy $group) use ($productoController) {
     $productoController->agregarRutas($group);
 });
+
+
+// Instancia mi controlador de mesas
+$mesaController = new MesaController();
+
+// Configura los endpoint utilizando RouteCollectorProxy (en productoController estan las rutas)
+$app->group('/api', function (RouteCollectorProxy $group) use ($mesaController) {
+$mesaController = new MesaController();
+    $mesaController->agregarRutas($group);
+});
+
+
 
 
 

@@ -14,16 +14,6 @@ class Producto
 
     public $estado;
 
-    // Inserta un nuevo producto en la base de datos.
-    public function InsertarProducto()
-    {
-        $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("INSERT INTO productos (nombreProducto, precioProducto, categoriaProducto) VALUES ('$this->nombreProducto', $this->precioProducto, '$this->categoriaProducto')");
-        $consulta->execute();
-        
-        // Retorna el ID del último producto insertado.
-        return $objetoAccesoDato->obtenerUltimoId();
-    }
 
     // Inserta un nuevo producto en la base de datos utilizando parámetros.
     public function InsertarProductoParametros()
@@ -113,6 +103,8 @@ class Producto
         // Retorna el ID del producto modificado o false si falla.
         return $this->idProducto;
     }
+
+    
     // Elimina un producto de la base de datos por su ID.
     public function BorrarProducto()
     {
