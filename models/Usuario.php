@@ -4,6 +4,7 @@ require_once __DIR__ . '/../db/ConexionPDO.php';
 require_once __DIR__ . '/../controllers/UsuarioController.php';
 
 
+
 class Usuario {
     public $idUsuario;
     public $nombre;
@@ -87,25 +88,60 @@ class Usuario {
         return $consulta->fetchObject('Usuario');
     }
 
-    // Modificar el estado y el ID del estado de un usuario
-    public static function modificarUsuario($estado, $numEstado, $idUsuario) {
+    // Modificar el estado, ID del estado, fecha de salida, puesto e ID del puesto de un usuario
+    public static function modificarUsuario($estado, $numEstado, $idUsuario, $fecha_salida, $puesto, $idPuesto) {
         $objConexionPDO = ConexionPDO::obtenerInstancia();
-        $consulta = $objConexionPDO->prepararConsulta("UPDATE usuarios SET estado = :estado, idEstado = :numEstado WHERE idUsuario = :idUsuario");
+
+        // Construir la consulta base
+        $consultaBase = "UPDATE usuarios SET estado = :estado, idEstado = :numEstado";
+
+        // Verificar si se proporciona una fecha de salida
+        if ($fecha_salida !== null) {
+            $consultaBase .= ", fecha_salida = :fecha_salida";
+        }
+
+        // Verificar si se proporciona un puesto e ID del puesto
+        if ($puesto !== null && $idPuesto !== null) {
+            $consultaBase .= ", puesto = :puesto, idPuesto = :idPuesto";
+        }
+
+        // Agregar la condición WHERE
+        $consultaBase .= " WHERE idUsuario = :idUsuario";
+
+        // Preparar la consulta
+        $consulta = $objConexionPDO->prepararConsulta($consultaBase);
+
+        // Asignar los valores
         $consulta->bindValue(':estado', $estado, PDO::PARAM_STR);
         $consulta->bindValue(':numEstado', $numEstado, PDO::PARAM_INT);
         $consulta->bindValue(':idUsuario', $idUsuario, PDO::PARAM_INT);
+
+        // Asignar la fecha de salida si se proporciona
+        if ($fecha_salida !== null) {
+            $consulta->bindValue(':fecha_salida', $fecha_salida, PDO::PARAM_STR);
+        }
+
+        // Asignar el puesto e ID del puesto si se proporciona
+        if ($puesto !== null && $idPuesto !== null) {
+            $consulta->bindValue(':puesto', $puesto, PDO::PARAM_STR);
+            $consulta->bindValue(':idPuesto', $idPuesto, PDO::PARAM_INT);
+        }
+
+        // Ejecutar la consulta
         $consulta->execute();
     }
 
+
     // Borrar un usuario cambiando su estado, ID del estado y fecha de baja
     public static function borrarUsuario($idUsuario) {
-        $fechaSalida = new DateTime();
+        $fechaSalida = date('Y-m-d H:i:s');
         $estado = 'Baja';
         $idEstado = 3;
+
         $objConexionPDO = ConexionPDO::obtenerInstancia();
         $consulta = $objConexionPDO->prepararConsulta("UPDATE usuarios SET fecha_salida = :fechaSalida, estado = :estado, idEstado = :idEstado WHERE idUsuario = :idUsuario");
         $consulta->bindValue(':idUsuario', $idUsuario, PDO::PARAM_INT);
-        $consulta->bindValue(':fechaSalida', $fechaSalida->format('d-m-Y'), PDO::PARAM_STR);
+        $consulta->bindValue(':fechaSalida', $fechaSalida, PDO::PARAM_STR);
         $consulta->bindValue(':estado', $estado, PDO::PARAM_STR);
         $consulta->bindValue(':idEstado', $idEstado, PDO::PARAM_INT);
         $consulta->execute();

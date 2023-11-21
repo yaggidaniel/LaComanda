@@ -11,6 +11,7 @@ use Slim\Routing\RouteCollectorProxy;
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../controllers/UsuarioController.php';
+require_once __DIR__ . '/../controllers/ProductosController.php';
 
 
 // Instantiate App
@@ -28,9 +29,18 @@ $app->addBodyParsingMiddleware();
 // Instancia mi controlador de usuarios
 $usuarioController = new UsuarioController();
 
+
 // Configura los endpoint utilizando RouteCollectorProxy (en UsuarioController estan las rutas)
 $app->group('/api', function (RouteCollectorProxy $group) use ($usuarioController) {
     $usuarioController->agregarRutas($group);
+});
+
+// Instancia mi controlador de productos
+$productoController = new ProductosController();
+
+// Configura los endpoint utilizando RouteCollectorProxy (en productoController estan las rutas)
+$app->group('/api', function (RouteCollectorProxy $group) use ($productoController) {
+    $productoController->agregarRutas($group);
 });
 
 
