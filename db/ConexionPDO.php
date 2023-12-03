@@ -50,3 +50,4 @@ class ConexionPDO
         trigger_error('ERROR: La clonación de este objeto no está permitida', E_USER_ERROR);
     }
 }
+?>

@@ -2,7 +2,6 @@
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Routing\RouteCollectorProxy;
 
 
 
@@ -106,7 +105,7 @@ class ProductoController implements IApiUsable
         $nuevoProducto = new Producto();
         $nuevoProducto->nombreProducto = $data['nombreProducto'];
         $nuevoProducto->precioProducto = $data['precioProducto'];
-        $nuevoProducto->categoriaProducto = $data['categoriaProducto'];
+        $nuevoProducto->sector = $data['categoriaProducto'];
 
         // Inserta el nuevo producto en la base de datos
         $idInsertado = $nuevoProducto->InsertarProductoParametros();
@@ -190,7 +189,7 @@ class ProductoController implements IApiUsable
         }
     
         if (isset($data['categoriaProducto'])) {
-            $producto->categoriaProducto = $data['categoriaProducto'];
+            $producto->sector = $data['categoriaProducto'];
         }
     
         if (isset($data['estado'])) {
@@ -217,13 +216,4 @@ class ProductoController implements IApiUsable
         }
     }
 
-    public function agregarRutas(RouteCollectorProxy $group)
-    {
-        // Define las rutas relacionadas con los productos
-        $group->get('/producto/{idProducto}', [$this, 'TraerUno']);
-        $group->get('/productos', [$this, 'TraerTodos']);
-        $group->post('/agregar-producto', [$this, 'CargarUno']);
-        $group->post('/modificar-producto', [$this, 'ModificarUno']);
-        $group->post('/borrar-producto/{idProducto}', [$this, 'BorrarUno']);
-    }
 }

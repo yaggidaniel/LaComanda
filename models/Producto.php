@@ -10,8 +10,7 @@ class Producto
     public $idProducto;
     public $nombreProducto;
     public $precioProducto;
-    public $categoriaProducto;
-
+    public $sector;
     public $estado;
 
 
@@ -19,10 +18,10 @@ class Producto
     public function InsertarProductoParametros()
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("INSERT INTO productos (nombreProducto, precioProducto, categoriaProducto) VALUES (:nombreProducto, :precioProducto, :categoriaProducto)");
+        $consulta = $objetoAccesoDato->prepararConsulta("INSERT INTO productos (nombreProducto, precioProducto, sector) VALUES (:nombreProducto, :precioProducto, :sector)");
         $consulta->bindValue(':nombreProducto', $this->nombreProducto, PDO::PARAM_STR);
         $consulta->bindValue(':precioProducto', $this->precioProducto, PDO::PARAM_STR);
-        $consulta->bindValue(':categoriaProducto', $this->categoriaProducto, PDO::PARAM_STR);
+        $consulta->bindValue(':sector', $this->sector, PDO::PARAM_STR);
         $consulta->execute();
 
         // Retorna el ID del último producto insertado.
@@ -33,7 +32,7 @@ class Producto
     public static function TraerTodosLosProductos()
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("SELECT idProducto, nombreProducto, precioProducto, categoriaProducto, estado FROM productos");
+        $consulta = $objetoAccesoDato->prepararConsulta("SELECT idProducto, nombreProducto, precioProducto, sector, estado FROM productos");
         $consulta->execute();
 
         // Retorna un arreglo de objetos Producto.
@@ -44,7 +43,7 @@ class Producto
     public static function TraerUnProducto($idProducto)
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("SELECT idProducto, nombreProducto, precioProducto, categoriaProducto FROM productos where idProducto = :idProducto");
+        $consulta = $objetoAccesoDato->prepararConsulta("SELECT idProducto, nombreProducto, precioProducto, sector FROM productos where idProducto = :idProducto");
         $consulta->bindValue(':idProducto', $idProducto, PDO::PARAM_INT);
         $consulta->execute();
         $productoBuscado = $consulta->fetchObject('Producto');
@@ -57,7 +56,7 @@ class Producto
     public static function TraerUnProductoPorNombre($nombreProducto)
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("SELECT idProducto, nombreProducto, precioProducto, categoriaProducto FROM productos WHERE nombreProducto = :nombreProducto");
+        $consulta = $objetoAccesoDato->prepararConsulta("SELECT idProducto, nombreProducto, precioProducto, sector FROM productos WHERE nombreProducto = :nombreProducto");
         $consulta->bindValue(':nombreProducto', $nombreProducto, PDO::PARAM_STR);
         $consulta->execute();
 
@@ -78,12 +77,12 @@ class Producto
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
         
         // Actualiza la consulta SQL para incluir el campo 'estado'
-        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE productos SET nombreProducto = :nombreProducto, precioProducto = :precioProducto, categoriaProducto = :categoriaProducto, estado = :estado WHERE idProducto = :idProducto");
+        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE productos SET nombreProducto = :nombreProducto, precioProducto = :precioProducto, sector = :sector, estado = :estado WHERE idProducto = :idProducto");
         
         $consulta->bindValue(':idProducto', $this->idProducto, PDO::PARAM_INT);
         $consulta->bindValue(':nombreProducto', $this->nombreProducto, PDO::PARAM_STR);
         $consulta->bindValue(':precioProducto', $this->precioProducto, PDO::PARAM_STR);
-        $consulta->bindValue(':categoriaProducto', $this->categoriaProducto, PDO::PARAM_STR);
+        $consulta->bindValue(':sector', $this->sector, PDO::PARAM_STR);
         
         // Verifica si 'estado' está configurado y vincula el valor
         if (isset($this->estado)) {

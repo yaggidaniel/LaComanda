@@ -289,26 +289,7 @@ class UsuarioController implements IApiUsable
             return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
         }
     }
-
-   
-    // Implementación de la interfaz para agregar rutas
-    public function agregarRutas(RouteCollectorProxy $group)
-    {
-        // Define las rutas relacionadas con el usuario y la interfaz
-        $group->get('/usuario/{idUsuario}', [$this, 'TraerUno']);
-        $group->get('/usuarios', [$this, 'TraerTodos']);
-        $group->post('/dar-de-alta-usuario', [$this, 'CargarUno']);
-        $group->post('/modificar', [$this, 'ModificarUno']);
-        $group->post('/dar-de-baja', [$this, 'BorrarUno']);
-        $group->get('/dias-horarios', [$this, 'obtenerDiasHorariosIngreso']);
-        $group->get('/operaciones/sector', [$this, 'obtenerCantidadOperacionesPorSector']);
-        $group->get('/operaciones/sector-empleado', [$this, 'obtenerCantidadOperacionesPorEmpleado']);
-        $group->get('/operaciones/individual', [$this, 'obtenerCantidadOperacionesPorSeparado']);
-    }
-
-
-
-  
+ 
 
     // Implementación de la interfaz para obtener días y horarios de ingreso de los empleados
     public function obtenerDiasHorariosIngreso(Request $request, Response $response, array $args)

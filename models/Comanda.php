@@ -4,24 +4,28 @@ require_once __DIR__ . '/../db/ConexionPDO.php';
 require_once __DIR__ . '/../controllers/PedidosController.php';
 
 
-class Pedido
+class Comanda
 {
     public $id;
     public $id_mesa;
+
     public $idUsuario;
     public $codigo;
     public $id_estado;
     public $tiempoEspera;
+    public $totalAPagar;
 
     public function InsertarPedido()
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("INSERT INTO pedidos (id_mesa, idUsuario, codigo, id_estado, tiempoEspera) VALUES (:id_mesa, :idUsuario, :codigo, :id_estado, :tiempoEspera)");
+        $consulta = $objetoAccesoDato->prepararConsulta("INSERT INTO pedidos (id_mesa, idUsuario, codigo, id_estado, tiempoEspera, totalAPagar) VALUES (:id_mesa, :idUsuario, :codigo, :id_estado, :tiempoEspera, :totalAPagar)");
         $consulta->bindValue(':id_mesa', $this->id_mesa, PDO::PARAM_INT);
         $consulta->bindValue(':idUsuario', $this->idUsuario, PDO::PARAM_INT);
         $consulta->bindValue(':codigo', $this->codigo, PDO::PARAM_STR);
         $consulta->bindValue(':id_estado', $this->id_estado, PDO::PARAM_INT);
         $consulta->bindValue(':tiempoEspera', $this->tiempoEspera, PDO::PARAM_STR);
+        $consulta->bindValue(':totalAPagar', $this->totalAPagar, PDO::PARAM_STR);
+
         $consulta->execute();
         return $objetoAccesoDato->obtenerUltimoId();
     }
@@ -59,13 +63,15 @@ class Pedido
     public function ModificarPedidoParametros()
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedidos SET id_mesa = :id_mesa, idUsuario = :idUsuario, codigo = :codigo, id_estado = :id_estado, tiempoEspera = :tiempoEspera WHERE id = :id");
+        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedidos SET id_mesa = :id_mesa, idUsuario = :idUsuario, codigo = :codigo, id_estado = :id_estado, tiempoEspera = :tiempoEspera, totalAPagar = :totalAPagar WHERE id = :id");
         $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
         $consulta->bindValue(':id_mesa', $this->id_mesa, PDO::PARAM_INT);
         $consulta->bindValue(':idUsuario', $this->idUsuario, PDO::PARAM_INT);
         $consulta->bindValue(':codigo', $this->codigo, PDO::PARAM_STR);
         $consulta->bindValue(':id_estado', $this->id_estado, PDO::PARAM_INT);
         $consulta->bindValue(':tiempoEspera', $this->tiempoEspera, PDO::PARAM_STR);
+        $consulta->bindValue(':totalAPagar', $this->totalAPagar, PDO::PARAM_STR);
+
         $resultado = $consulta->execute();
 
         $filasAfectadas = $consulta->rowCount();
