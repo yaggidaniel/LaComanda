@@ -1,7 +1,6 @@
 <?php
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Routing\RouteCollectorProxy;
 
 require_once __DIR__ . '/../models/Cliente.php'; 
 require_once __DIR__ . '/../db/ConexionPDO.php'; 

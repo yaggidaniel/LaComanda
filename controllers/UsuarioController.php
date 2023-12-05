@@ -2,7 +2,6 @@
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Routing\RouteCollectorProxy;
 
 // Importa la clase Usuario y otros archivos necesarios
 require_once __DIR__ . '/../models/Usuario.php';
@@ -22,7 +21,7 @@ class UsuarioController implements IApiUsable
          $data = $request->getParsedBody();
  
          // Validar que se proporcionen todos los campos necesarios
-         if (empty($data['nombre']) || empty($data['mail']) || empty($data['clave']) || empty($data['puesto'])) {
+         if (empty($data['nombre']) || empty($data['mail']) || empty($data['clave']) || empty($data['sector'])) {
              $response->getBody()->write(json_encode(array('error' => 'Todos los campos son obligatorios')));
              return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
          }
@@ -41,8 +40,8 @@ class UsuarioController implements IApiUsable
              return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
          }
  
-         // Creo un array asociativo para chequear que el puesto ingresado en el request sea válido
-         $mapaPuestos = [
+         // Creo un array asociativo para chequear que el sector ingresado en el request sea válido
+         $mapaSector = [
              'Bartender' => 1,
              'Cervecero' => 2,
              'Cocinero' => 3,
@@ -50,9 +49,9 @@ class UsuarioController implements IApiUsable
              'Socio' => 5,
          ];
          
-         // Si se ingresa un puesto que no está en el array da error.
-         if (!isset($mapaPuestos[$data['puesto']])) {
-             $response->getBody()->write(json_encode(array('error' => 'Puesto no válido')));
+         // Si se ingresa un sector que no está en el array da error.
+         if (!isset($mapaSector[$data['sector']])) {
+             $response->getBody()->write(json_encode(array('error' => 'Sector no válido')));
              return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
          }
  
@@ -61,9 +60,9 @@ class UsuarioController implements IApiUsable
          $nuevoUsuario->nombre = $data['nombre'];
          $nuevoUsuario->mail = $data['mail'];
          $nuevoUsuario->clave = password_hash($data['clave'], PASSWORD_DEFAULT); // Hashear la contraseña
-         $nuevoUsuario->puesto = $data['puesto'];
+         $nuevoUsuario->sector = $data['sector'];
          $nuevoUsuario->estado = 'Activo'; // estado predeterminado al crear
-         $nuevoUsuario->idPuesto = $mapaPuestos[$data['puesto']];
+         $nuevoUsuario->idSector = $mapaSector[$data['sector']];
          $nuevoUsuario->idEstado = 1; // estado predeterminado 1 Activo
          $nuevoUsuario->fecha_ingreso = date('Y-m-d'); // Fecha de ingreso actual
  
@@ -150,8 +149,8 @@ class UsuarioController implements IApiUsable
             return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
         }
     
-        // Creo un array asociativo para chequear que el puesto ingresado en el request sea válido
-        $mapaPuestos = [
+        // Creo un array asociativo para chequear que el sector ingresado en el request sea válido
+        $mapaSector = [
             'Bartender' => 1,
             'Cervecero' => 2,
             'Cocinero' => 3,
@@ -166,14 +165,14 @@ class UsuarioController implements IApiUsable
             'Baja' => 3,
         ];
     
-        // Verificar y asignar el nuevo puesto
-        if (isset($data['puesto'])) {
-            if (!isset($mapaPuestos[$data['puesto']])) {
-                $response->getBody()->write(json_encode(array('error' => 'Puesto no válido')));
+        // Verificar y asignar el nuevo sector
+        if (isset($data['sector'])) {
+            if (!isset($mapaSector[$data['sector']])) {
+                $response->getBody()->write(json_encode(array('error' => 'sector no válido')));
                 return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
             }
-            $usuario->puesto = $data['puesto'];
-            $usuario->idPuesto = $mapaPuestos[$data['puesto']];
+            $usuario->sector = $data['sector'];
+            $usuario->idSector = $mapaSector[$data['sector']];
         }
     
         // Verificar y asignar el nuevo estado
@@ -193,7 +192,7 @@ class UsuarioController implements IApiUsable
         }
     
         // Realiza la operación de modificar el usuario
-        Usuario::modificarUsuario($usuario->estado, $usuario->idEstado, $idUsuario, $usuario->fecha_salida, $usuario->puesto, $usuario->idPuesto);
+        Usuario::modificarUsuario($usuario->estado, $usuario->idEstado, $idUsuario, $usuario->fecha_salida, $usuario->sector, $usuario->idSector);
     
         // Construye la respuesta
         $result = array('mensaje' => 'Usuario modificado correctamente');

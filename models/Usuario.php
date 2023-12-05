@@ -10,21 +10,21 @@ class Usuario {
     public $nombre;
     public $mail;
     public $clave;
-    public $puesto;
+    public $sector;
     public $estado;
-    public $idPuesto;
+    public $idSector;
     public $idEstado;
     public $fecha_ingreso;
     public $fecha_salida;
 
     // Obtener el ID del puesto
     public function GetIdPuesto() {
-        return $this->idPuesto;
+        return $this->idSector;
     }
 
     // Obtener el nombre del puesto
     public function GetPuesto() {
-        return $this->puesto;
+        return $this->sector;
     }
 
     // Obtener el ID del usuario
@@ -44,9 +44,9 @@ class Usuario {
         $consulta->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':mail', $this->mail, PDO::PARAM_STR);
         $consulta->bindValue(':clave', $this->clave, PDO::PARAM_INT);
-        $consulta->bindValue(':puesto', $this->puesto, PDO::PARAM_STR);
+        $consulta->bindValue(':puesto', $this->sector, PDO::PARAM_STR);
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
-        $consulta->bindValue(':idPuesto', $this->idPuesto, PDO::PARAM_INT);
+        $consulta->bindValue(':idPuesto', $this->idSector, PDO::PARAM_INT);
         $consulta->bindValue(':idEstado', $this->idEstado, PDO::PARAM_INT);
         $consulta->bindValue(':fecha_ingreso', $this->fecha_ingreso, PDO::PARAM_STR);
         $consulta->bindValue(':fecha_salida', $this->fecha_salida, PDO::PARAM_STR);

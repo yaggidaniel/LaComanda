@@ -8,12 +8,11 @@ class Comanda
 {
     public $id;
     public $id_mesa;
-
-    public $idUsuario;
-    public $codigo;
-    public $id_estado;
-    public $tiempoEspera;
-    public $totalAPagar;
+    public $idUsuario; 
+    public $codigo;   
+    public $id_estado;   
+    public $tiempoEspera;   
+    public $totalAPagar;   
 
     public function InsertarPedido()
     {
@@ -63,7 +62,7 @@ class Comanda
     public function ModificarPedidoParametros()
     {
         $objetoAccesoDato = ConexionPDO::obtenerInstancia();
-        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedidos SET id_mesa = :id_mesa, idUsuario = :idUsuario, codigo = :codigo, id_estado = :id_estado, tiempoEspera = :tiempoEspera, totalAPagar = :totalAPagar WHERE id = :id");
+        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE comandas SET id_mesa = :id_mesa, idUsuario = :idUsuario, codigo = :codigo, id_estado = :id_estado, tiempoEspera = :tiempoEspera, totalAPagar = :totalAPagar WHERE id = :id");
         $consulta->bindValue(':id', $this->id, PDO::PARAM_INT);
         $consulta->bindValue(':id_mesa', $this->id_mesa, PDO::PARAM_INT);
         $consulta->bindValue(':idUsuario', $this->idUsuario, PDO::PARAM_INT);
